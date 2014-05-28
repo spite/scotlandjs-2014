@@ -16,6 +16,7 @@ The plan was to show how to get from an empty page to [a working demo](http://ww
 I decided to create a tool that would "play" the diff between different stages of the project, and explain what was going on. It wasn't perfect, but it wasn't terrible either. Another library might come out of this.
 
 Here's the code player: http://www.clicktorelease.com/talks/scotlandjs-2014/
+and here's the recording of the talk in video format: http://vimeo.com/96477742
 
 It covers:
 
