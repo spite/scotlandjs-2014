@@ -2,7 +2,7 @@ scotlandjs-2014
 =============
 
 "Getting started with three.js and WebGL"
-Three.js/WebGL presentation for Future JS Barcelona 2014
+Three.js/WebGL presentation for ScotlandJS 2014
 
 ![Image](./assets/snapshot.jpg)
 
