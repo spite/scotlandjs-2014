@@ -1,0 +1,23 @@
+*{ box-sizing: border-box; padding: 0; margin: 0;}
+body{ overflow: none;}
+#code{ position: absolute; left: 0; top: 0; bottom: 0; right: 50%; margin-bottom: 40px;}
+#code h1{ font-size: 20px; font-family: monaco; position: absolute; left: 20px; top: 20px; }
+#code h2{ font-size: 14px; font-family: monaco; position: absolute; left: 20px; top: 50px; }
+#output{ position: absolute; left: 0; top: 70px; bottom: 0; right: 0; padding: 20px; white-space: pre-wrap; font-family: monaco; font-size: 17px; overflow: auto;}
+#container{ position: absolute; left: 50%; top: 0; right: 0; bottom: 0; width: 500%; height: 100%; border: none; margin: 0; padding: 0; }
+
+#container{
+	background: #7d7e7d; /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover,  #7d7e7d 0%, #0e0e0e 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#7d7e7d), color-stop(100%,#0e0e0e)); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  #7d7e7d 0%,#0e0e0e 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#0e0e0e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+#player{ position: absolute; bottom: 0; left: 0; right: 0;  font-family: tahoma;}
+#prevBtn{ position: absolute; left: 10px; bottom: 10px; }
+#nextBtn{ position: absolute; right: 10px; bottom: 10px; text-align: right;}
+#prevBtn, #nextBtn{ color: #ddd;}
+#hashtag{ position: absolute; right: 10px; top: 10px; font-family: tahoma; }

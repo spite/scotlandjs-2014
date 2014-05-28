@@ -1,0 +1,155 @@
+<style>
+*{ box-sizing: border-box; }
+body{
+	background: #7d7e7d; /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover,  #7d7e7d 0%, #0e0e0e 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#7d7e7d), color-stop(100%,#0e0e0e)); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  #7d7e7d 0%,#0e0e0e 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  #7d7e7d 0%,#0e0e0e 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#0e0e0e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+</style>
+<script src="js/Three.js"></script>
+<script src="js/ImprovedNoise.js"></script>
+
+<script type="x-shader/x-vertex" id="sem-vs">
+
+	varying vec2 vN;
+	varying vec3 vNormal;
+
+	void main() {
+
+		vec3 e = normalize( vec3( modelViewMatrix * vec4( position, 1.0 ) ) );
+		vec3 n = normalize( normalMatrix * normal );
+
+		vec3 r = reflect( e, n );
+		float m = 2. * sqrt( pow( r.x, 2. ) + pow( r.y, 2. ) + pow( r.z + 1., 2. ) );
+		vN = r.xy / m + .5;
+
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1. );
+		vNormal = n;
+
+	}
+
+</script>
+
+<script type="x-shader/x-vertex" id="sem-fs">
+	
+	uniform sampler2D tMatCap;
+
+	varying vec2 vN;
+	varying vec3 vNormal;
+
+	void main() {
+		
+		vec3 base = texture2D( tMatCap, vN ).rgb;
+		gl_FragColor = vec4( base, 1. );
+
+	}
+	
+</script>
+	
+<script>
+
+'use strict';
+
+var renderer, scene, camera, mesh,
+container,
+material, material2,
+noise = new ImprovedNoise();
+
+window.addEventListener( 'load', init );
+
+function updateBlob( geometry ) {
+
+	var t = .001 * Date.now();
+	var n = new THREE.Vector3( 0, 0, 0 );
+	for( var j = 0; j < geometry.vertices.length; j++ ) {
+		var v = geometry.vertices[ j ];
+		n.copy( v );
+		n.normalize();
+		var d = 30 + 3 * noise.noise( .1 * v.x + t, .1 * v.y + .9 * t, .1 * v.z + 1.1 * t );
+		n.multiplyScalar( d );
+		v.copy( n );
+	}
+	
+	geometry.verticesNeedUpdate = true;
+    geometry.normalsNeedUpdate = true;
+   	geometry.computeCentroids();
+    geometry.computeFaceNormals();
+    geometry.computeVertexNormals();
+    geometry.computeMorphNormals();
+    geometry.computeTangents();
+
+}
+
+function init() {
+	
+	scene = new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 1000 );
+	camera.position.z = 100;
+
+	scene.add( camera );
+
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	container = renderer.domElement;
+	document.body.appendChild( container );
+
+	material = new THREE.ShaderMaterial( {
+
+		uniforms: { 
+			tMatCap: { type: 't', value: THREE.ImageUtils.loadTexture( 'assets/matcap.jpg' ) },
+		},
+		vertexShader: document.getElementById( 'sem-vs' ).textContent,
+		fragmentShader: document.getElementById( 'sem-fs' ).textContent,
+		shading: THREE.SmoothShading
+		
+	} );
+
+	material.uniforms.tMatCap.value.wrapS = material.uniforms.tMatCap.value.wrapT = 
+	THREE.ClampToEdgeWrapping;
+
+	material2 = material.clone();
+	material2.uniforms.tMatCap.value = THREE.ImageUtils.loadTexture( 'assets/matcap2.jpg' );
+
+	var s = 30;
+	var geometry = new THREE.IcosahedronGeometry( 10, 4 );
+	geometry = new THREE.CubeGeometry( 10, 10, 10, s, s, s );
+	mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+	updateBlob( mesh.geometry );
+
+	render();
+	
+}
+
+function render() {
+
+	requestAnimationFrame( render );
+
+	updateBlob( mesh.geometry );
+
+	renderer.autoClear = true;
+
+	mesh.rotation.y += .05;
+
+	mesh.position.set( -50, 0, 0 );	
+	scene.overrideMaterial = material;
+	renderer.render( scene, camera );
+
+	renderer.autoClear = false;
+	
+	mesh.position.set( 50, 0, 0 );	
+	scene.overrideMaterial = material2;
+	renderer.render( scene, camera );
+
+}
+
+</script>
+<script src="js/scripts.js"></script>

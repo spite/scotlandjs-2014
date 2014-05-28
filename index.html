@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Diffr</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,300' rel='stylesheet' type='text/css'>
+		<script src="js/jsdiff.js" ></script>
+		<link rel="stylesheet" href="highlight/styles/monokai_sublime.css">
+		<script src="highlight/highlight.pack.js"></script>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body class="hljs">
+
+	<div id="code">
+	
+		<h1></h1>
+		<h2></h2>
+
+		<pre><code class="language-markup language-xml" id="output"></code></pre>
+
+	</div>
+
+	<iframe id="container" ></iframe>
+
+	<div id="player">
+		<a href="#" id="prevBtn">Prev.</a>
+		<a href="#" id="nextBtn">Next</a>
+	</div>
+
+	<div id="hashtag" >#sjsJaume</div>
+
+<script>
+
+function fetchFile( src, c ) {
+
+	var oReq = new XMLHttpRequest();
+	oReq.onload = function() {
+		c( oReq.responseText );
+	};
+	oReq.open( 'get', src, true );
+	oReq.send();
+
+}	
+
+var output = document.getElementById( 'output' );
+var iframe = document.getElementById( 'container' );
+var title = document.querySelector( '#code h1' );
+var subtitle = document.querySelector( '#code h2' );
+
+function Script( path, onLoaded ) {
+
+	this.path = path;
+
+	this.parts = [];
+	this.loaded = 0;
+	this.toLoad = 0;
+
+	this.onLoaded = onLoaded;
+
+}
+
+Script.prototype.add = function( src, title, subtitle ) {
+
+	this.parts.push( {
+
+		src: src,
+		title: title,
+		subtitle: subtitle,
+		content: null
+
+	} );
+
+	this.toLoad++;
+
+}
+
+Script.prototype.onSourceLoaded = function( t ) {
+
+	this.loaded++;
+	if( this.loaded == this.toLoad ) this.onLoaded();
+
+}
+
+Script.prototype.load = function() {
+
+	var self = this;
+	for( var j = 0, m = this.parts.length; j < m; j++ ) {
+		fetchFile( this.path + '/' + this.parts[ j ].src, function( t ) {
+			this.content = t;
+			self.onSourceLoaded();
+		}.bind( this.parts[ j ] ) );
+	}
+
+}
+
+Script.prototype.get = function( n ) {
+
+	return this.parts[ n ];
+
+}
+
+var script = new Script( 'demo', playScript );
+
+window.addEventListener( 'load', init );
+
+function init() {
+
+	script.add( 'empty.html', 'Part 0', 'Empty' );
+	script.add( 'base.html', 'Part 0', 'Base' );
+	script.add( 'start.html', 'Part 1', 'Let\'s start' );
+	script.add( 'init.html', 'Part 2', 'Add WebGL renderer' );
+	script.add( 'render-loop.html', 'Part 3', 'Add render loop' );
+	script.add( 'setup.html', 'Part 4', 'Add scene and camera' );
+	script.add( 'object-normalmaterial.html', 'Part 5', 'Add a mesh' );
+	script.add( 'object-normalmaterial-animation.html', 'Part 6', 'Animate the mesh' );
+	script.add( 'object-normal-animation-shader.html', 'Part 7', 'Create a shader' );
+	script.add( 'object-sem.html', 'Part 8', 'Create a custom shader' );
+	script.add( 'final.html', 'Part 9', 'Done!' );
+	script.add( 'final-post.html', 'Part 10', 'Adding post' );
+
+	script.load();
+
+	onResize();
+
+}
+
+window.addEventListener( 'resize', onResize );
+
+var paused = false;
+document.getElementById( 'code' ).addEventListener( 'click', function( e) {
+	
+	paused = !paused;
+	e.preventDefault();
+
+	document.title = paused?'Paused':'Playing';
+
+} );
+
+function onResize() {
+
+	iframe.style.width = window.innerWidth / 2 + 'px';
+	iframe.style.height = window.innerHeight + 'px';
+
+}
+
+var part = 0;
+var speed = .5;
+
+document.getElementById( 'prevBtn' ).addEventListener( 'click', function( e ) {
+
+	part--;
+	playScript();
+
+	e.preventDefault();
+
+} );
+
+document.getElementById( 'nextBtn' ).addEventListener( 'click', function( e ) {
+
+	part++;
+	playScript();
+
+	e.preventDefault();
+
+} );
+
+function playScript() {
+
+	if( part == script.parts.length - 1 ) {
+		console.log( 'done' );
+		return;
+	}
+
+	document.getElementById( 'prevBtn' ).textContent = script.get( part ).subtitle;
+	if( part < script.parts.length - 2 ) {
+		document.getElementById( 'nextBtn' ).textContent = script.get( part + 2 ).subtitle;
+	} else {
+		document.getElementById( 'nextBtn' ).textContent = '';
+	}
+
+	title.textContent = 'Getting started with three.js and WebGL';
+	subtitle.textContent = script.get( part + 1 ).title + ': ' + script.get( part + 1 ).subtitle;
+
+	processDiff( JsDiff.diffLines( script.get( part ).content, script.get( part + 1 ).content ), function() {
+		iframe.src = script.path + '/' + script.get( part + 1 ).src;
+		iframe.onload = function() {
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.src = 'demo/js/scripts.js';
+			iframe.appendChild( s );
+		}
+
+	} );
+
+}
+
+function processDiff( changes, onDone ) {
+
+	var currentPart = part;
+
+	var count = 0;
+	for( var j = 0; j < changes.length; j++ ) {
+		if( changes[ j ].added ) {
+			count += changes[ j ].value.length;
+		}
+	}
+
+	var counter = 0;
+
+	function p() {
+
+		if( !paused ) {
+
+			var str = '';
+			var t = 0;
+			for( var j = 0; j < changes.length; j++ ) {
+				if( changes[ j ].added ) {
+					var c = changes[ j ].value.length;
+					if( t + c > counter ) { c = counter - t }
+					str += changes[ j ].value.substr( 0, c );
+					if( c > 0 && c < changes[ j ].value.length ) str += '|\n';
+					t += c;
+				} else {
+					if( !changes[ j ].removed ) {
+						str += changes[ j ].value;
+					}
+				}
+			}
+			
+			playSound();
+			output.textContent = str;
+
+			hljs.highlightBlock( output );
+
+			counter++;
+			if( counter > count ) {
+
+				onDone();
+				return;
+			}
+
+		}
+
+		if( currentPart == part ) {
+			setTimeout( p, speed * ( 50 + 100 * Math.random() ) );
+		}
+
+	}
+
+	p();
+
+}
+
+var AudioContext = AudioContext || webkitAudioContext;
+
+var context = new AudioContext();
+var audioBuffer;
+
+function loadSound() {
+
+	var request = new XMLHttpRequest();
+	request.open( 'GET', 'assets/key.wav', true );
+	request.responseType = 'arraybuffer';
+
+	request.onload = function() {
+
+		context.decodeAudioData( request.response, function( buffer ) {
+			
+			audioBuffer = buffer;
+
+		}, function() {
+			console.log( 'error' );
+		} );
+
+	};
+
+	request.send();
+
+}
+
+function playSound() {
+
+	return;
+	if( !audioBuffer ) return;
+	var source = context.createBufferSource(); 
+	source.buffer = audioBuffer;
+	source.playbackRate.value = .9 + Math.random() * .2;
+
+	source.connect( context.destination );
+	source.start( 0 );
+
+}
+
+loadSound();
+
+</script>
+		
+	</body>
+</html>

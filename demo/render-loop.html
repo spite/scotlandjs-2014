@@ -1,0 +1,30 @@
+<script src="js/Three.js"></script>
+	
+<script>
+
+'use strict';
+
+var renderer,
+container;
+
+window.addEventListener( 'load', init );
+
+function init() {
+	
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	container = renderer.domElement;
+	document.body.appendChild( container );
+
+	render();
+	
+}
+
+function render() {
+
+	requestAnimationFrame( render );
+
+}
+
+</script>
