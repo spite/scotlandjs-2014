@@ -1,9 +1,9 @@
 *{ box-sizing: border-box; padding: 0; margin: 0;}
 body{ overflow: none;}
-#code{ position: absolute; font-family: monaco; left: 0; top: 0; bottom: 0; right: 50%; margin-bottom: 40px;}
+#code{ position: absolute; font-family: monaco; left: 0; top: 0; bottom: 0; right: 50%; }
 #code h1{ font-size: 20px; margin: 20px 20px 10px 20px }
 #code h2{ font-size: 14px; padding: 0px 20px }
-#output{ bottom: 0; right: 0; padding: 20px; white-space: pre-wrap; font-family: monaco; font-size: 17px; overflow: auto;}
+#output{ position: absolute; top: 120px; left: 0; bottom: 0; right: 0; padding: 0px 20px; white-space: pre-wrap; font-family: monaco; font-size: 17px; overflow: auto;}
 #container{ position: absolute; left: 50%; top: 0; right: 0; bottom: 0; width: 500%; height: 100%; border: none; margin: 0; padding: 0; }
 
 #container{
