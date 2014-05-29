@@ -20,7 +20,7 @@ and here's the recording of the talk in video format: http://vimeo.com/96477742
 
 It covers:
 
-* setting uo
+* setting up
 * adding the WebGL renderer
 * adding a render loop
 * adding a scene and a camera
