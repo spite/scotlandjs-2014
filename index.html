@@ -17,16 +17,17 @@
 		<h1></h1>
 		<h2></h2>
 
+		<div id="player">
+			<a href="#" id="prevBtn">Prev</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="#" id="nextBtn">Next</a>
+		</div>
+
 		<pre><code class="language-markup language-xml" id="output"></code></pre>
 
 	</div>
 
 	<iframe id="container" scrolling="no"></iframe>
-
-	<div id="player">
-		<a href="#" id="prevBtn">Prev.</a>
-		<a href="#" id="nextBtn">Next</a>
-	</div>
 
 	<div id="hashtag" >#sjsJaume</div>
 
@@ -172,9 +173,14 @@ function playScript() {
 		return;
 	}
 
-	document.getElementById( 'prevBtn' ).textContent = script.get( part ).subtitle;
+	if ( part > 0 ) {
+		document.getElementById( 'prevBtn' ).textContent = '⟵ ' + script.get( part ).subtitle;
+	} else {
+		document.getElementById( 'prevBtn' ).textContent = '';
+	}
+
 	if( part < script.parts.length - 2 ) {
-		document.getElementById( 'nextBtn' ).textContent = script.get( part + 2 ).subtitle;
+		document.getElementById( 'nextBtn' ).textContent = script.get( part + 2 ).subtitle + ' ⟶';
 	} else {
 		document.getElementById( 'nextBtn' ).textContent = '';
 	}
