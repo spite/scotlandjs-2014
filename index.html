@@ -216,6 +216,8 @@ function processDiff( changes, onDone ) {
 
 	function p() {
 
+		if( currentPart !== part ) return;
+
 		if( !paused ) {
 
 			var str = '';
@@ -248,9 +250,7 @@ function processDiff( changes, onDone ) {
 
 		}
 
-		if( currentPart == part ) {
-			setTimeout( p, speed * ( 50 + 100 * Math.random() ) );
-		}
+		setTimeout( p, speed * ( 50 + 100 * Math.random() ) );
 
 	}
 
